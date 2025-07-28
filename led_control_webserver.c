@@ -161,6 +161,12 @@ void dns_resolved_cb(const char *name, const ip_addr_t *ipaddr, void *arg) {
         // Configurar informações do cliente
         struct mqtt_connect_client_info_t ci;
         memset(&ci, 0, sizeof(ci));
+
+        // Necessário:
+        ci.client_id = MQTT_CLIENT_ID;  // ID único do cliente MQTT
+        ci.keep_alive = 60;             // Intervalo de keep-alive (em segundos)
+
+        /* 
         ci.client_id = MQTT_CLIENT_ID;
         ci.keep_alive = 60;
         ci.will_topic = NULL;
@@ -169,6 +175,7 @@ void dns_resolved_cb(const char *name, const ip_addr_t *ipaddr, void *arg) {
         ci.will_retain = 0;
         ci.client_user = NULL;
         ci.client_pass = NULL;
+        */
 
         // Tentar conectar ao broker
         err_t err = mqtt_client_connect(mqtt_state.mqtt_client, ipaddr, MQTT_PORT, mqtt_connection_cb, NULL, &ci);
@@ -258,7 +265,7 @@ void mqtt_run() {
             if (pin_status != last_pin_status || (now - last_publish) >= 10000) {
                 char msg[16];
                 snprintf(msg, sizeof(msg), "%d", pin_status);
-                printf("[DEBUG] Enviando estado do pino 18: %s\n", msg);  //Teste de depuração para verificar o valor do pino.
+                printf("[DEBUG] Enviando estado do pino 18: %s\n", msg);  //test    
                 mqtt_publish_message(mqtt_state.mqtt_client, MQTT_TOPIC_STATUS, msg);
                 
                 last_pin_status = pin_status;
